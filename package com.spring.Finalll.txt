@@ -1,0 +1,18 @@
+package com.spring.Finalll;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+
+
+@SpringBootApplication
+@EntityScan(basePackages = "com.spring.Finalll.entity") // Scan entity package
+@EnableJpaRepositories(basePackages = "com.spring.Finalll.repository")
+public class FinalllApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(FinalllApplication.class, args);
+	}
+
+}

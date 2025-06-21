@@ -1,0 +1,34 @@
+
+
+package com.spring.Finalll.config.service;
+
+import com.spring.Finalll.entity.User;
+import com.spring.Finalll.repository.UserRepository;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
+
+@Service
+public class CustomUserDetailsService implements UserDetailsService {
+
+    private final UserRepository userRepository;
+
+    public CustomUserDetailsService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = userRepository.findByUserName(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
+
+        // Use correct getter based on entity definition
+        return org.springframework.security.core.userdetails.User.builder()
+                .username(user.getUsername())  // Make sure this matches your User entity's method
+                .password(user.getPassword())
+                .roles("USER")  // Add roles if needed
+                .build();
+    }
+}
+

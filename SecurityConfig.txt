@@ -1,0 +1,179 @@
+////package com.spring.Finalll.config;
+////
+////import com.spring.Finalll.config.JwtAuthenticationFilter;
+////import org.springframework.context.annotation.Bean;
+////import org.springframework.context.annotation.Configuration;
+////import org.springframework.security.authentication.AuthenticationManager;
+////import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+////import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+////import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+////import org.springframework.security.config.http.SessionCreationPolicy;
+////import org.springframework.security.core.userdetails.UserDetailsService;
+////import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+////import org.springframework.security.crypto.password.PasswordEncoder;
+////import org.springframework.security.web.SecurityFilterChain;
+////import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+////
+////@Configuration
+////public class SecurityConfig {
+////
+////    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+////
+////    // Constructor injection for JwtAuthenticationFilter
+////    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
+////        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+////    }
+////
+////    /**
+////     * Configure the security filter chain.
+////     */
+////    @Bean
+////    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+////        http
+////                .csrf().disable() // Disable CSRF for stateless JWT
+////                .authorizeHttpRequests(auth -> auth
+////                        .requestMatchers("/register", "/login").permitAll() // Publicly accessible endpoints
+////                        .anyRequest().authenticated() // All other endpoints require authentication
+////                )
+////                .sessionManagement(session -> session
+////                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // Stateless session
+////                )
+////                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class); // Add JWT filter
+////        return http.build();
+////    }
+////
+////    /**
+////     * Define the AuthenticationManager bean.
+////     */
+////    @Bean
+////    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+////        return config.getAuthenticationManager();
+////    }
+////
+////    /**
+////     * Define the PasswordEncoder bean.
+////     */
+////    @Bean
+////    public PasswordEncoder passwordEncoder() {
+////        return new BCryptPasswordEncoder();
+////    }
+////
+////    /**
+////     * Authentication Provider for UserDetailsService and PasswordEncoder.
+////     */
+////    @Bean
+////    public DaoAuthenticationProvider authenticationProvider(UserDetailsService userDetailsService) {
+////        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+////        provider.setUserDetailsService(userDetailsService); // Your custom UserDetailsService
+////        provider.setPasswordEncoder(passwordEncoder()); // Use BCryptPasswordEncoder
+////        return provider;
+////    }
+////}
+//
+//
+//package com.spring.Finalll.config;
+//
+//import com.spring.Finalll.config.service.CustomUserDetailsService;
+//import org.springframework.context.annotation.Bean;
+//import org.springframework.context.annotation.Configuration;
+//import org.springframework.security.authentication.AuthenticationManager;
+//import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+//import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+//import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+//import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+//import org.springframework.security.crypto.password.PasswordEncoder;
+//import org.springframework.security.web.SecurityFilterChain;
+//import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+//
+//@Configuration
+//public class SecurityConfig {
+//
+//    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+//    private final CustomUserDetailsService customUserDetailsService;
+//
+//    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter,
+//                          CustomUserDetailsService customUserDetailsService) {
+//        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+//        this.customUserDetailsService = customUserDetailsService;
+//    }
+//
+//    @Bean
+//    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+//        http
+//                .csrf().disable()
+//                .authorizeHttpRequests(auth -> auth
+//                        .requestMatchers("/register", "/login").permitAll()
+//                        .anyRequest().authenticated()
+//                )
+//                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+//        return http.build();
+//    }
+//
+//    @Bean
+//    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+//        return config.getAuthenticationManager();
+//    }
+//
+//    @Bean
+//    public PasswordEncoder passwordEncoder() {
+//        return new BCryptPasswordEncoder();
+//    }
+//
+//    @Bean
+//    public DaoAuthenticationProvider authenticationProvider() {
+//        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+//        provider.setUserDetailsService(customUserDetailsService);
+//        provider.setPasswordEncoder(passwordEncoder());
+//        return provider;
+//    }
+//}
+
+package com.spring.Finalll.config;
+
+import com.spring.Finalll.config.JwtAuthenticationFilter;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+@Configuration
+public class SecurityConfig {
+
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+    }
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .csrf().disable()
+                .authorizeRequests()
+                .requestMatchers("/register", "/login").permitAll() // Public endpoints
+                .anyRequest().authenticated() // All other requests require authentication
+                .and()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS) // Stateless for JWT
+                .and()
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class); // Add JWT filter
+
+        return http.build();
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+}
+
